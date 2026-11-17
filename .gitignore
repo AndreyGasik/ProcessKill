@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Локальные скрипты скриншотов
+_shots/
+
+# Собранные пакеты уходят в Releases, не в репозиторий
+*.AppImage

@@ -1,67 +1,113 @@
 # ProcessKill
-Простой убийца процессов в стиле Nord, мгновенное убийство верхнего процесса клавишей Del
-<img width="513" height="575" alt="1" src="https://github.com/user-attachments/assets/a9531edb-d087-483b-98d0-e13baa57061f" />
 
+[English](#english) | [Русский](#русский)
 
-⚡ Process Manager Ultra
-Process Manager Ultra — это настольная утилита для мониторинга и управления процессами в Linux с графическим интерфейсом на PyQt6.
+---
 
-Группировка процессов по корневому предку (отслеживание цепочек запуска).
+## English
 
-Точная память PSS (включает разделяемую память) — столбец «Память MB».
+A compact Linux process manager in a single Python file: processes are grouped by their root ancestor, memory is counted precisely (PSS), and a runaway chain of processes is killed with one press of the Delete key.
 
-Прогресс-бары в ячейках памяти для визуальной оценки загрузки RAM.
+Python + PyQt6, Linux only. Interface language: Russian.
 
-Сортировка по CPU или памяти одним кликом по заголовку.
+<p align="center">
+  <img src="docs/screenshots/processkill-dark.png" width="49%" alt="Dark theme" />
+  <img src="docs/screenshots/processkill-light.png" width="49%" alt="Light theme" />
+</p>
 
-Завершение процессов (SIGTERM → SIGKILL) по кнопке или клавише Delete.
+### Features
 
-Умное обновление без мерцания с сохранением выделенной строки.
+- **Grouping by root ancestor** — a chain of child processes is one row with a `×N` counter; CPU and memory are summed across the whole group
+- **Accurate memory** — PSS (shared memory included, Anon + File + Shmem) plus GPU-shared memory (GTT), with a bar against total RAM
+- **Kill a group** — SIGTERM, then SIGKILL after 1.5 s; by button or by the Delete key
+- **Sorting** — by CPU or by memory, one click on the column header
+- **Low-noise list** — session services (dbus, gvfs, pipewire, …) are hidden; shows your user's processes plus anything consuming more than 3% CPU or 150 MB of RAM
+- **Flicker-free updates** — the list refreshes every 3 s keeping the selection
+- **RAM / CPU summary cards**, dark and light themes
 
-Тема Tokyo Night, тени, кнопки Minimize/Close, перетаскивание за заголовок.
+### Run
 
-🚀 Установка и запуск
-Убедитесь, что у вас установлен Python 3.8+ и пакеты:
-
-bash
+```bash
 pip install psutil PyQt6
-Скачайте файл, установите права и запускайте.
+python3 ProcessKill.py
+```
 
-Примечание: утилита использует /proc и предназначена только для Linux.
+Or grab the ready **AppImage** from [Releases](../../releases) — no Python needed:
 
-🖥️ Интерфейс
-Заголовок — перетаскивание окна.
+```bash
+chmod +x ProcessKill-2.1.0-x86_64.AppImage
+./ProcessKill-2.1.0-x86_64.AppImage
+```
 
-Таблица:
+### Diagnostics
 
-Процесс — имя корневого процесса и количество дочерних (×N).
+Not sure why a process is missing from the list?
 
-ЦП % — суммарное использование CPU по группе (с учётом числа ядер).
+```bash
+python3 ProcessKill.py --why <part-of-name>
+```
 
-Память MB — числовое значение + прогресс-бар от общей доступной RAM.
+### Dependencies
 
-Сортировка — клик по заголовку «ЦП %» или «Память MB» (повторный клик меняет направление).
+| Package | Purpose |
+|---|---|
+| [PyQt6](https://pypi.org/project/PyQt6/) | UI |
+| [psutil](https://pypi.org/project/psutil/) | process and memory info (`/proc`) |
 
-Кнопка «💀 Завершить процесс» — завершает выделенную группу (сначала SIGTERM, через 1.5 с — SIGKILL).
+---
 
-Клавиша Delete — быстрый аналог кнопки.
+## Русский
 
-📊 Особенности
-Чёрный список системных процессов (dbus, gvfs, pipewire, etc.) — они не отображаются.
+Компактный менеджер процессов для Linux в одном Python-файле: процессы группируются по корневому предку, память считается точно (PSS), а runaway-цепочку процессов можно завершить одним нажатием Delete.
 
-Фильтр по пользователю — показываются только процессы текущего пользователя, а также процессы с высоким потреблением (>3% CPU или >150 MB RAM).
+Python + PyQt6, только Linux. Интерфейс — русский.
 
-Автообновление каждые 3 секунды.
+<p align="center">
+  <img src="docs/screenshots/processkill-dark.png" width="49%" alt="Тёмная тема" />
+  <img src="docs/screenshots/processkill-light.png" width="49%" alt="Светлая тема" />
+</p>
 
-Нижняя панель показывает количество групп и общую загрузку RAM.
+### Возможности
 
-📦 Зависимости
-psutil — получение информации о процессах.
+- **Группировка по корневому предку.** Цепочка дочерних процессов — одна строка со счётчиком `×N`; ЦП и память суммируются по всей группе.
+- **Точная память.** PSS (включая разделяемую: Anon + File + Shmem) плюс память GPU, переехавшая в RAM (GTT). Рядом — бар от общей памяти системы.
+- **Завершение группы.** SIGTERM, через 1.5 с — SIGKILL. Кнопкой или клавишей Delete.
+- **Сортировка** по ЦП или памяти — клик по заголовку столбца, повторный клик меняет направление.
+- **Низкий шум списка.** Системные службы сессии (dbus, gvfs, pipewire и т.п.) скрыты; показываются процессы вашего пользователя и всё, что потребляет больше 3% ЦП или 150 МБ памяти.
+- **Обновление без мерцания** каждые 3 с — выделенная строка сохраняется.
+- **Карточки RAM / ЦП** сверху, тёмная и светлая темы.
 
-PyQt6 — графический интерфейс.
+### Запуск
 
-📄 Лицензия
-Распространяется под лицензией MIT — свободно используйте, модифицируйте и распространяйте.
+```bash
+pip install psutil PyQt6
+python3 ProcessKill.py
+```
 
-⭐ Если утилита вам полезна, поставьте звёздочку на GitHub!
-Сообщения об ошибках и предложения приветствуются в Issues.
+Или возьмите готовый **AppImage** из [Releases](../../releases) — Python не нужен:
+
+```bash
+chmod +x ProcessKill-2.1.0-x86_64.AppImage
+./ProcessKill-2.1.0-x86_64.AppImage
+```
+
+### Диагностика
+
+Не понимаете, почему процесса нет в списке?
+
+```bash
+python3 ProcessKill.py --why <часть имени>
+```
+
+### Зависимости
+
+| Пакет | Назначение |
+|---|---|
+| [PyQt6](https://pypi.org/project/PyQt6/) | интерфейс |
+| [psutil](https://pypi.org/project/psutil/) | информация о процессах и памяти (`/proc`) |
+
+---
+
+## License / Лицензия
+
+[MIT](LICENSE)
